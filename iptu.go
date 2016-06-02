@@ -14,5 +14,7 @@ func main() {
 	// Importer
 	if *importPtr != "" {
 		importer.Import(*importPtr)
+	} else {
+		flag.Usage()
 	}
 }
