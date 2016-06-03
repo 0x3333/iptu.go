@@ -7,12 +7,13 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql" // Just to initialize MySQL Driver
 )
 
 // Import IPTU data
-func Import(filename string) {
+func Import(filename string, dryrun bool) {
 
 	db := connectDb()
 	defer db.Close()
@@ -21,9 +22,11 @@ func Import(filename string) {
 	defer file.Close()
 
 	print("Truncating table...")
-	_, err := db.Exec("TRUNCATE TABLE `iptu`")
-	if err != nil {
-		panic(err.Error())
+	if !dryrun {
+		_, err := db.Exec("TRUNCATE TABLE `iptu`")
+		if err != nil {
+			panic(err.Error())
+		}
 	}
 	println(" Table truncated!")
 
@@ -36,10 +39,20 @@ func Import(filename string) {
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Pula o Header
 	i := 0
+	tx, err := db.Begin()
+	if err != nil {
+		panic(err.Error())
+	}
 	for scanner.Scan() {
 		i++
-		if i%1000 == 0 {
-			fmt.Printf("Importing %s\n", RenderInteger("#,###.", i))
+		if i%10000 == 0 {
+			fmt.Printf("%v Importing %s\n", time.Now(), RenderInteger("#,###.", i))
+
+			tx.Commit()
+			tx, err = db.Begin()
+			if err != nil {
+				panic(err.Error())
+			}
 		}
 		slices := strings.Split(scanner.Text(), "|")
 
@@ -49,7 +62,7 @@ func Import(filename string) {
 		// Tipo 1
 		if strings.Contains(slices[4], "CPF") {
 			slices[4] = "CPF"
-			slices[5] = slices[5][2 : len(slices[5])-1]
+			slices[5] = slices[5][3:len(slices[5])]
 		} else if strings.Contains(slices[4], "CNPJ") {
 			slices[4] = "CNPJ"
 		} else {
@@ -58,7 +71,7 @@ func Import(filename string) {
 		// Tipo 2
 		if strings.Contains(slices[7], "CPF") {
 			slices[7] = "CPF"
-			slices[8] = slices[8][2 : len(slices[8])-1]
+			slices[8] = slices[8][3:len(slices[8])]
 		} else if strings.Contains(slices[7], "CNPJ") {
 			slices[7] = "CNPJ"
 		} else {
@@ -67,11 +80,11 @@ func Import(filename string) {
 
 		// Nome 1
 		if len(slices[6]) > 1 && (slices[6][0] == '\'' || slices[6][0] == ',' || slices[6][0] == '.') {
-			slices[6] = slices[6][1 : len(slices[6])-1]
+			slices[6] = slices[6][1:len(slices[6])]
 		}
 		// Nome 2
 		if len(slices[9]) > 1 && (slices[9][0] == '\'' || slices[9][0] == ',' || slices[9][0] == '.') {
-			slices[9] = slices[9][1 : len(slices[9])-1]
+			slices[9] = slices[9][1:len(slices[9])]
 		}
 
 		// Numericos
@@ -93,11 +106,14 @@ func Import(filename string) {
 			slices[25] = ""
 		}
 
-		_, err = stmtIns.Exec(*(convertSlice(slices))...)
-		if err != nil {
-			panic(err.Error())
+		if !dryrun {
+			_, err = stmtIns.Exec(*(convertSlice(slices))...)
+			if err != nil {
+				panic(err.Error())
+			}
 		}
 	}
+	tx.Commit()
 
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -116,7 +132,7 @@ func openFile(filename string) *os.File {
 
 func connectDb() *sql.DB {
 	print("Connecting to DB... ")
-	db, err := sql.Open("mysql", "iptu:iptu@/iptu")
+	db, err := sql.Open("mysql", "iptu:iptu@/iptu?autocommit=false")
 	if err != nil {
 		panic(err.Error())
 	}

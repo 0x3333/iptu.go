@@ -38,6 +38,5 @@ CREATE TABLE `iptu` (
   UNIQUE KEY `numero_contribuinte` (`numero_contribuinte`),
   KEY `doc_contribuinte_1` (`doc_contribuinte_1`),
   KEY `doc_contribuinte_2` (`doc_contribuinte_2`),
-  FULLTEXT KEY `nome_contribuinte_1_ft` (`nome_contribuinte_1`),
-  FULLTEXT KEY `nome_contribuinte_2_ft` (`nome_contribuinte_2`)
+  FULLTEXT KEY `ft1` (`nome_contribuinte_1`, `nome_contribuinte_2`, `nome_logradouro_imovel`, `referencia_imovel`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
