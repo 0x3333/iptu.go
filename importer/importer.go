@@ -13,9 +13,7 @@ import (
 )
 
 // Import IPTU data
-func Import(filename string, dryrun bool) {
-
-	db := connectDb()
+func Import(db *sql.DB, filename string, dryrun bool) {
 	defer db.Close()
 
 	file := openFile(filename)
@@ -128,20 +126,6 @@ func openFile(filename string) *os.File {
 	}
 	println(" File opened!")
 	return file
-}
-
-func connectDb() *sql.DB {
-	print("Connecting to DB... ")
-	db, err := sql.Open("mysql", "iptu:iptu@/iptu?autocommit=false")
-	if err != nil {
-		panic(err.Error())
-	}
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
-	println(" Connected to DB!")
-	return db
 }
 
 func convertSlice(slice []string) *[]interface{} {
