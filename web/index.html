@@ -8,17 +8,139 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
     <title>Consulta de Contribuintes do IPTU - São Paulo - SP</title>
+
+    <style>
+        .jumbotron {
+            text-align: center;
+        }
+
+        .row.header {
+            margin-top: 3rem;
+        }
+
+        .row.error {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>Consulta de Contribuintes do IPTU - São Paulo - SP</h1>
-
+        <div class="row header">
+            <div class="col-sm-12">
+                <div class="jumbotron">
+                    <h1 class="display-3">Consulta IPTU</h1>
+                    <p class="lead">Aqui você pode consultar pelos Contribuintes de IPTU da Cidade de São Paulo</p>
+                </div>
+            </div>
+        </div>
+        <div class="row header">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="input-group">
+                    <input id="termos" type="text" class="form-control" placeholder="Digite os termos da busca">
+                    <span class="input-group-btn"><button id="pesquisar" class="btn btn-success" type="button">Pesquisar!</button></span>
+                </div>
+            </div>
+        </div>
+        <div class="row error header">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-danger" role="alert">
+                    <strong>Ops!</strong> Aconteceu algum erro ao processar a sua solicitação.
+                </div>
+            </div>
+        </div>
+        <div class="row noresults header">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Ops!</strong> Nenhum resultado encontrado!
+                </div>
+            </div>
+        </div>
+        <!-- <div class="row result header">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">NomeContribuinte1(DocContribuinte1) - NomeContribuinte2(DocContribuinte2)</div>
+                    <div class="card-block">
+                        <div class="row">
+                            <div class="col-sm-3">NumeroContribuinte</div>
+                            <div class="col-sm-7">NomeLogradouroImovel, NumeroImovel - ComplementoImovel, BairroImovel</div>
+                            <div class="col-sm-2">CEP: <strong>CepImovel</strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">Ref.: <strong>ReferenciaImovel</strong></div>
+                            <div class="col-sm-3">Fração Ideal: <strong>FracaoIdeal</strong></div>
+                            <div class="col-sm-3">Ano Construção: <strong>AnoConstrucaoCorrigido</strong></div>
+                            <div class="col-sm-3">Pavimentos: <strong>QuantidadePavimentos</strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4">Área Terreno: <strong>AreaTerreno</strong></div>
+                            <div class="col-sm-4">Área Construida: <strong>AreaConstruida</strong></div>
+                            <div class="col-sm-4">Área Ocupada: <strong>AreaOcupada</strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">Valor m<sup>2</sup> Terreno: <strong>ValorM2Terreno</strong></div>
+                            <div class="col-sm-6">Valor m<sup>2</sup> Construção: <strong>ValorM2Construcao</strong></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-5">TipoUsoImovel</div>
+                            <div class="col-sm-4">TipoPadraoConstrucao</div>
+                            <div class="col-sm-3">TipoTerreno</div>
+                        </div>
+                        <! - - "TestadaCalculo": 53, - - >
+                        <! - - "FatorObsolescencia": 0.99 - - >
+                    </div>
+                </div>
+            </div>
+        </div> -->
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
+    <script>
+        $(function() {
+            $("#termos").keypress(function(e) {
+                if (e.which == 13) {
+                    $("#pesquisar").click();
+                }
+            });
+            $("#pesquisar").click(function() {
+                console.log();
+                $.ajax({
+                    dataType: "json",
+                    url: "search",
+                    type: "get",
+                    data: {
+                        termos: $("#termos").val(),
+                    },
+                    success: function(response) {
+                        var results = "";
+                        $.each(response, function(index, entry) {
+                            var template =
+                                '<div class="row result header"> <div class="col-sm-12"> <div class="card"> <div class="card-header">${NomeContribuinte1}(${DocContribuinte1}) - ${NomeContribuinte2}(${DocContribuinte2})</div> <div class="card-block"> <div class="row"> <div class="col-sm-3">${NumeroContribuinte}</div> <div class="col-sm-7">${NomeLogradouroImovel}, ${NumeroImovel} - ${ComplementoImovel}, ${BairroImovel}</div> <div class="col-sm-2">CEP: <strong>${CepImovel}</strong></div> </div> <div class="row"> <div class="col-sm-3">Ref.: <strong>${ReferenciaImovel}</strong></div> <div class="col-sm-3">Fração Ideal: <strong>${FracaoIdeal}</strong></div> <div class="col-sm-3">Ano Construção: <strong>${AnoConstrucaoCorrigido}</strong></div> <div class="col-sm-3">Pavimentos: <strong>${QuantidadePavimentos}</strong></div> </div> <div class="row"> <div class="col-sm-4">Área Terreno: <strong>${AreaTerreno}</strong></div> <div class="col-sm-4">Área Construida: <strong>${AreaConstruida}</strong></div> <div class="col-sm-4">Área Ocupada: <strong>${AreaOcupada}</strong></div> </div> <div class="row"> <div class="col-sm-6">Valor m<sup>2</sup> Terreno: <strong>${ValorM2Terreno}</strong></div> <div class="col-sm-6">Valor m<sup>2</sup> Construção: <strong>${ValorM2Construcao}</strong></div> </div> <div class="row"> <div class="col-sm-5">${TipoUsoImovel}</div> <div class="col-sm-4">${TipoPadraoConstrucao}</div> <div class="col-sm-3">${TipoTerreno}</div> </div></div> </div> </div> </div>',
+                                result = template;
+
+
+                            $.each(entry, function(key, value) {
+                                result = result.replace("${" + key + "}", value);
+                            });
+                            results += result;
+                        });
+                        $(".row.result").remove();
+                        $(".row.noresults").toggle(response.length == 0);
+                        $(".container").append(results);
+                    },
+                    error: function(xhr) {
+                        $(".row.error").show();
+                        window.setTimeout(function() {
+                            $(".row.error").hide();
+                        }, 3000);
+                    }
+                });
+
+            });
+        });
+    </script>
 </body>
 
 </html>
