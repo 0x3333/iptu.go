@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="Consulta de contribuintes do IPTU da Cidade de São Paulo - SP">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
@@ -124,6 +125,14 @@
                         $(".row.invalid").hide();
                         $(".row.result").remove();
                         pesquisando = true;
+                        try {
+                            ga('send', {
+                                hitType: 'event',
+                                eventCategory: 'IPTU',
+                                eventAction: 'search',
+                                eventLabel: $("#termos").val()
+                            });
+                        } catch (err) {}
                         $.ajax({
                             dataType: "json",
                             url: "search",
@@ -135,7 +144,7 @@
                                 var results = "";
                                 $.each(response, function(index, entry) {
                                     var template =
-                                        '<div class="row result header m-t-3"> <div class="col-sm-12"> <div class="card"> <div class="card-header"><strong>${NomeContribuinte1}</strong> (<strong>${TipoContribuinte1}</strong> ${DocContribuinte1}) - <strong>${NomeContribuinte2}</strong> (<strong>${TipoContribuinte2}</strong> ${DocContribuinte2})</div> <div class="card-block"> <div class="row"> <div class="col-sm-3"><strong>N. Contribuinte:</strong> ${NumeroContribuinte}</div> <div class="col-sm-9"><strong>Endereço: </strong>${NomeLogradouroImovel}, ${NumeroImovel} - ${ComplementoImovel}, ${BairroImovel} - <strong>CEP:</strong> ${CepImovel}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Ref.:</strong> ${ReferenciaImovel}</div> <div class="col-sm-3"><strong>Fração Ideal:</strong> ${FracaoIdeal}</div> <div class="col-sm-3"><strong>Ano Construção:</strong> ${AnoConstrucaoCorrigido}</div> <div class="col-sm-3"><strong>Pavimentos:</strong> ${QuantidadePavimentos}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Área Terreno:</strong> ${AreaTerreno}</div> <div class="col-sm-3"><strong>Área Construida:</strong> ${AreaConstruida}</div> <div class="col-sm-3"><strong>Área Ocupada:</strong> ${AreaOcupada}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Terreno:</strong> ${ValorM2Terreno}</div> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Construção:</strong> ${ValorM2Construcao}</div> </div> <div class="row"> <div class="col-sm-12">${TipoUsoImovel} - ${TipoPadraoConstrucao} - ${TipoTerreno}</div> </div></div> </div> </div> </div>',
+                                        '<div class="row result header m-t-1"> <div class="col-sm-12"> <div class="card"> <div class="card-header"><strong>${NomeContribuinte1}</strong> (<strong>${TipoContribuinte1}</strong> ${DocContribuinte1}) - <strong>${NomeContribuinte2}</strong> (<strong>${TipoContribuinte2}</strong> ${DocContribuinte2})</div> <div class="card-block"> <div class="row"> <div class="col-sm-3"><strong>N. Contribuinte:</strong> ${NumeroContribuinte}</div> <div class="col-sm-9"><strong>Endereço: </strong>${NomeLogradouroImovel}, ${NumeroImovel} - ${ComplementoImovel}, ${BairroImovel} - <strong>CEP:</strong> ${CepImovel}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Ref.:</strong> ${ReferenciaImovel}</div> <div class="col-sm-3"><strong>Fração Ideal:</strong> ${FracaoIdeal}</div> <div class="col-sm-3"><strong>Ano Construção:</strong> ${AnoConstrucaoCorrigido}</div> <div class="col-sm-3"><strong>Pavimentos:</strong> ${QuantidadePavimentos}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Área Terreno:</strong> ${AreaTerreno}</div> <div class="col-sm-3"><strong>Área Construida:</strong> ${AreaConstruida}</div> <div class="col-sm-3"><strong>Área Ocupada:</strong> ${AreaOcupada}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Terreno:</strong> ${ValorM2Terreno}</div> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Construção:</strong> ${ValorM2Construcao}</div> </div> <div class="row"> <div class="col-sm-12">${TipoUsoImovel} - ${TipoPadraoConstrucao} - ${TipoTerreno}</div> </div></div> </div> </div> </div>',
                                         result = template;
 
                                     $.each(entry, function(key, value) {
