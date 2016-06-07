@@ -7,34 +7,38 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css">
     <title>Consulta de Contribuintes do IPTU - São Paulo - SP</title>
 
     <style>
-        .jumbotron {
-            text-align: center;
-        }
-
-        .row.header {
-            margin-top: 3rem;
-        }
-
-        .row.error {
+        .row.message {
             display: none;
+        }
+
+        .fa.fa-circle-o-notch {
+            vertical-align: middle;
+        }
+
+        .div-fake-hidden {
+            width: 0px;
+            height: 0px;
+            overflow: hidden;
         }
     </style>
 </head>
 
 <body>
+    <div class="div-fake-hidden"><i class="fa fa-circle-o-notch fa-spin fa-spin-2x fa-2x fa-fw"></i></div>
     <div class="container">
-        <div class="row header">
+        <div class="row header m-t-3">
             <div class="col-sm-12">
-                <div class="jumbotron">
+                <div class="jumbotron text-xs-center">
                     <h1 class="display-3">Consulta IPTU</h1>
                     <p class="lead">Aqui você pode consultar pelos Contribuintes de IPTU da Cidade de São Paulo</p>
                 </div>
             </div>
         </div>
-        <div class="row header">
+        <div class="row header m-t-3">
             <div class="col-sm-offset-3 col-sm-6">
                 <div class="input-group">
                     <input id="termos" type="text" class="form-control" placeholder="Digite os termos da busca">
@@ -42,103 +46,134 @@
                 </div>
             </div>
         </div>
-        <div class="row error header">
+        <div class="row error message header m-t-3">
             <div class="col-sm-offset-3 col-sm-6">
                 <div class="alert alert-danger" role="alert">
                     <strong>Ops!</strong> Aconteceu algum erro ao processar a sua solicitação.
                 </div>
             </div>
         </div>
-        <div class="row noresults header">
+        <div class="row noresults message header m-t-3">
             <div class="col-sm-offset-3 col-sm-6">
                 <div class="alert alert-warning" role="alert">
                     <strong>Ops!</strong> Nenhum resultado encontrado!
                 </div>
             </div>
         </div>
-        <!-- <div class="row result header">
-            <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header">NomeContribuinte1(DocContribuinte1) - NomeContribuinte2(DocContribuinte2)</div>
-                    <div class="card-block">
-                        <div class="row">
-                            <div class="col-sm-3">NumeroContribuinte</div>
-                            <div class="col-sm-7">NomeLogradouroImovel, NumeroImovel - ComplementoImovel, BairroImovel</div>
-                            <div class="col-sm-2">CEP: <strong>CepImovel</strong></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-3">Ref.: <strong>ReferenciaImovel</strong></div>
-                            <div class="col-sm-3">Fração Ideal: <strong>FracaoIdeal</strong></div>
-                            <div class="col-sm-3">Ano Construção: <strong>AnoConstrucaoCorrigido</strong></div>
-                            <div class="col-sm-3">Pavimentos: <strong>QuantidadePavimentos</strong></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-4">Área Terreno: <strong>AreaTerreno</strong></div>
-                            <div class="col-sm-4">Área Construida: <strong>AreaConstruida</strong></div>
-                            <div class="col-sm-4">Área Ocupada: <strong>AreaOcupada</strong></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-6">Valor m<sup>2</sup> Terreno: <strong>ValorM2Terreno</strong></div>
-                            <div class="col-sm-6">Valor m<sup>2</sup> Construção: <strong>ValorM2Construcao</strong></div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-5">TipoUsoImovel</div>
-                            <div class="col-sm-4">TipoPadraoConstrucao</div>
-                            <div class="col-sm-3">TipoTerreno</div>
-                        </div>
-                        <! - - "TestadaCalculo": 53, - - >
-                        <! - - "FatorObsolescencia": 0.99 - - >
-                    </div>
+        <div class="row invalid message header m-t-3">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Ops!</strong> Digite termos com mais de 3 caracteres.
                 </div>
             </div>
-        </div> -->
+        </div>
+        <div class="row loading message header m-t-3 text-xs-center">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-info" role="alert">
+                    <i class="fa fa-circle-o-notch fa-spin fa-spin-2x fa-2x fa-fw"></i> Pesquisando...
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
     <script>
+        (function(i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function() {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-78908654-1', 'auto');
+        ga('send', 'pageview');
+
         $(function() {
+
             $("#termos").keypress(function(e) {
                 if (e.which == 13) {
                     $("#pesquisar").click();
                 }
             });
+            var regexCnpj = /(..)(...)(...)(....)(..)/,
+                regexCpf = /(...)(...)(...)(..)/,
+                pesquisando = false;
             $("#pesquisar").click(function() {
-                console.log();
-                $.ajax({
-                    dataType: "json",
-                    url: "search",
-                    type: "get",
-                    data: {
-                        termos: $("#termos").val(),
-                    },
-                    success: function(response) {
-                        var results = "";
-                        $.each(response, function(index, entry) {
-                            var template =
-                                '<div class="row result header"> <div class="col-sm-12"> <div class="card"> <div class="card-header">${NomeContribuinte1}(${DocContribuinte1}) - ${NomeContribuinte2}(${DocContribuinte2})</div> <div class="card-block"> <div class="row"> <div class="col-sm-3">${NumeroContribuinte}</div> <div class="col-sm-7">${NomeLogradouroImovel}, ${NumeroImovel} - ${ComplementoImovel}, ${BairroImovel}</div> <div class="col-sm-2">CEP: <strong>${CepImovel}</strong></div> </div> <div class="row"> <div class="col-sm-3">Ref.: <strong>${ReferenciaImovel}</strong></div> <div class="col-sm-3">Fração Ideal: <strong>${FracaoIdeal}</strong></div> <div class="col-sm-3">Ano Construção: <strong>${AnoConstrucaoCorrigido}</strong></div> <div class="col-sm-3">Pavimentos: <strong>${QuantidadePavimentos}</strong></div> </div> <div class="row"> <div class="col-sm-4">Área Terreno: <strong>${AreaTerreno}</strong></div> <div class="col-sm-4">Área Construida: <strong>${AreaConstruida}</strong></div> <div class="col-sm-4">Área Ocupada: <strong>${AreaOcupada}</strong></div> </div> <div class="row"> <div class="col-sm-6">Valor m<sup>2</sup> Terreno: <strong>${ValorM2Terreno}</strong></div> <div class="col-sm-6">Valor m<sup>2</sup> Construção: <strong>${ValorM2Construcao}</strong></div> </div> <div class="row"> <div class="col-sm-5">${TipoUsoImovel}</div> <div class="col-sm-4">${TipoPadraoConstrucao}</div> <div class="col-sm-3">${TipoTerreno}</div> </div></div> </div> </div> </div>',
-                                result = template;
-
-
-                            $.each(entry, function(key, value) {
-                                result = result.replace("${" + key + "}", value);
-                            });
-                            results += result;
-                        });
+                if (!pesquisando) {
+                    var hasError;
+                    $.each($("#termos").val().split(" "), function(index, value) {
+                        if (value.length < 3) {
+                            hasError = true;
+                        }
+                        if (value.length > 2) {
+                            hasError = false;
+                            return false;
+                        }
+                    });
+                    if (hasError) {
+                        $(".row.invalid").show();
                         $(".row.result").remove();
-                        $(".row.noresults").toggle(response.length == 0);
-                        $(".container").append(results);
-                    },
-                    error: function(xhr) {
-                        $(".row.error").show();
-                        window.setTimeout(function() {
-                            $(".row.error").hide();
-                        }, 3000);
-                    }
-                });
+                    } else {
+                        $(".row.loading").show();
+                        $(".row.invalid").hide();
+                        $(".row.result").remove();
+                        pesquisando = true;
+                        $.ajax({
+                            dataType: "json",
+                            url: "search",
+                            type: "get",
+                            data: {
+                                termos: $("#termos").val(),
+                            },
+                            success: function(response) {
+                                var results = "";
+                                $.each(response, function(index, entry) {
+                                    var template =
+                                        '<div class="row result header m-t-3"> <div class="col-sm-12"> <div class="card"> <div class="card-header"><strong>${NomeContribuinte1}</strong> (<strong>${TipoContribuinte1}</strong> ${DocContribuinte1}) - <strong>${NomeContribuinte2}</strong> (<strong>${TipoContribuinte2}</strong> ${DocContribuinte2})</div> <div class="card-block"> <div class="row"> <div class="col-sm-3"><strong>N. Contribuinte:</strong> ${NumeroContribuinte}</div> <div class="col-sm-9"><strong>Endereço: </strong>${NomeLogradouroImovel}, ${NumeroImovel} - ${ComplementoImovel}, ${BairroImovel} - <strong>CEP:</strong> ${CepImovel}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Ref.:</strong> ${ReferenciaImovel}</div> <div class="col-sm-3"><strong>Fração Ideal:</strong> ${FracaoIdeal}</div> <div class="col-sm-3"><strong>Ano Construção:</strong> ${AnoConstrucaoCorrigido}</div> <div class="col-sm-3"><strong>Pavimentos:</strong> ${QuantidadePavimentos}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Área Terreno:</strong> ${AreaTerreno}</div> <div class="col-sm-3"><strong>Área Construida:</strong> ${AreaConstruida}</div> <div class="col-sm-3"><strong>Área Ocupada:</strong> ${AreaOcupada}</div> </div> <div class="row"> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Terreno:</strong> ${ValorM2Terreno}</div> <div class="col-sm-3"><strong>Valor m<sup>2</sup> Construção:</strong> ${ValorM2Construcao}</div> </div> <div class="row"> <div class="col-sm-12">${TipoUsoImovel} - ${TipoPadraoConstrucao} - ${TipoTerreno}</div> </div></div> </div> </div> </div>',
+                                        result = template;
 
+                                    $.each(entry, function(key, value) {
+                                        if (key === "DocContribuinte1" || key == "DocContribuinte2") {
+                                            if (value.length == 14) {
+                                                value = value.replace(regexCnpj, "$1.$2.$3/$4-$5");
+                                            } else if (value.length == 11) {
+                                                value = value.replace(regexCpf, "$1.$2.$3-$4");
+                                            }
+                                        }
+                                        if (!(typeof value === "undefined")) {
+                                            try {
+                                                value = value.toLocaleString();
+                                            } catch (err) {}
+                                        }
+                                        result = result.replace("${" + key + "}", value);
+                                    });
+                                    results += result;
+                                });
+                                $(".row.result").remove();
+                                $(".row.noresults").toggle(response.length == 0);
+                                $(".container").append(results);
+                                $(".row.loading").hide();
+                                pesquisando = false;
+                            },
+                            error: function(xhr) {
+                                $(".row.loading").hide();
+                                $(".row.error").show();
+                                window.setTimeout(function() {
+                                    $(".row.error").hide();
+                                }, 3000);
+                                pesquisando = false;
+                            }
+                        });
+                    }
+                }
             });
+            $("#termos").focus();
         });
     </script>
 </body>

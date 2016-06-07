@@ -15,13 +15,14 @@ func main() {
 	dryRunPtr := flag.Bool("dryrun", false, "Dry run usage, doesn't alter the database")
 	flag.Parse()
 
-	// Connect to database
-	db := connectDb()
-
 	// Importer
 	if *serverPtr {
+		// Connect to database
+		db := connectDb()
 		server.Server(db)
 	} else if *importPtr != "" {
+		// Connect to database
+		db := connectDb()
 		importer.Import(db, *importPtr, *dryRunPtr)
 	} else {
 		flag.Usage()
