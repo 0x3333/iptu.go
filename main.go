@@ -1,10 +1,11 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 
+	"bitbucket.org/terciofilho/iptu.go/db"
 	"bitbucket.org/terciofilho/iptu.go/importer"
+	"bitbucket.org/terciofilho/iptu.go/log"
 	"bitbucket.org/terciofilho/iptu.go/server"
 )
 
@@ -17,28 +18,14 @@ func main() {
 
 	// Importer
 	if *serverPtr {
-		// Connect to database
-		db := connectDb()
-		server.Server(db)
+		log.Info.Println("Starting as a Server...")
+		db.ConnectDb()
+		server.StartServer()
 	} else if *importPtr != "" {
-		// Connect to database
-		db := connectDb()
-		importer.Import(db, *importPtr, *dryRunPtr)
+		log.Info.Println("Starting as a Importer...")
+		db.ConnectDb()
+		importer.RunImport(*importPtr, *dryRunPtr)
 	} else {
 		flag.Usage()
 	}
-}
-
-func connectDb() *sql.DB {
-	print("Connecting to DB... ")
-	db, err := sql.Open("mysql", "iptu:iptu@/iptu?autocommit=false")
-	if err != nil {
-		panic(err.Error())
-	}
-	err = db.Ping()
-	if err != nil {
-		panic(err.Error())
-	}
-	println(" Connected to DB!")
-	return db
 }

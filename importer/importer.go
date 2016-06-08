@@ -2,33 +2,29 @@ package importer
 
 import (
 	"bufio"
-	"database/sql"
 	"fmt"
-	"log"
 	"os"
 	"strings"
-	"time"
 
-	_ "github.com/go-sql-driver/mysql" // Just to initialize MySQL Driver
+	"bitbucket.org/terciofilho/iptu.go/db"
+	"bitbucket.org/terciofilho/iptu.go/log"
 )
 
-// Import IPTU data
-func Import(db *sql.DB, filename string, dryrun bool) {
-	defer db.Close()
-
+// RunImport IPTU data
+func RunImport(filename string, dryrun bool) {
 	file := openFile(filename)
 	defer file.Close()
 
 	print("Truncating table...")
 	if !dryrun {
-		_, err := db.Exec("TRUNCATE TABLE `iptu`")
+		_, err := db.Instance.Exec("TRUNCATE TABLE `iptu`")
 		if err != nil {
 			panic(err.Error())
 		}
 	}
 	println(" Table truncated!")
 
-	stmtIns, err := db.Prepare("INSERT INTO `iptu` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+	stmtIns, err := db.Instance.Prepare("INSERT INTO `iptu` VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -37,17 +33,17 @@ func Import(db *sql.DB, filename string, dryrun bool) {
 	scanner := bufio.NewScanner(file)
 	scanner.Scan() // Pula o Header
 	i := 0
-	tx, err := db.Begin()
+	tx, err := db.Instance.Begin()
 	if err != nil {
 		panic(err.Error())
 	}
 	for scanner.Scan() {
 		i++
 		if i%10000 == 0 {
-			fmt.Printf("%v Importing %s\n", time.Now(), RenderInteger("#,###.", i))
+			log.Info.Printf("Importing %s\n", RenderInteger("#,###.", i))
 
 			tx.Commit()
-			tx, err = db.Begin()
+			tx, err = db.Instance.Begin()
 			if err != nil {
 				panic(err.Error())
 			}
@@ -85,7 +81,7 @@ func Import(db *sql.DB, filename string, dryrun bool) {
 			slices[9] = slices[9][1:len(slices[9])]
 		}
 
-		// Numericos
+		// Numéricos
 		slices[19] = convertNum(slices[19])
 		slices[23] = convertNum(slices[23])
 		slices[24] = convertNum(slices[24])
@@ -114,7 +110,7 @@ func Import(db *sql.DB, filename string, dryrun bool) {
 	tx.Commit()
 
 	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
+		log.Error.Println(err.Error())
 	}
 }
 
@@ -122,7 +118,7 @@ func openFile(filename string) *os.File {
 	print("Opening file...")
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Error.Println(err.Error())
 	}
 	println(" File opened!")
 	return file

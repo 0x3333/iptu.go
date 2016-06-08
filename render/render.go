@@ -1,0 +1,174 @@
+package render
+
+import (
+	"html/template"
+	"io"
+
+	"bitbucket.org/terciofilho/iptu.go/api"
+	"bitbucket.org/terciofilho/iptu.go/log"
+)
+
+const tpl = `
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="Consulta de contribuintes do IPTU da Cidade de São Paulo - SP">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/css/bootstrap.min.css">
+    <title>Consulta de Contribuintes do IPTU - São Paulo - SP</title>
+
+    <style>
+        .row.message {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="div-fake-hidden"><i class="fa fa-circle-o-notch fa-spin fa-spin-2x fa-2x fa-fw"></i></div>
+    <div class="container">
+        <div class="row header m-t-3">
+            <div class="col-sm-12">
+                <div class="jumbotron text-xs-center m-b-0">
+                    <h1 class="display-3">Consulta IPTU</h1>
+                    <p class="lead">Aqui você pode consultar pelos Contribuintes de IPTU da Cidade de São Paulo</p>
+                </div>
+            </div>
+        </div>
+        <div class="row header m-y-1">
+            <div class="col-sm-offset-2 col-sm-8">
+                <div class="input-group">
+                    <span class="input-group-addon">Nome/CNPJ/CPF/Logradouro:</span>
+                    <input id="termos" type="text" class="form-control" placeholder="Digite os termos da busca">
+                    <span class="input-group-btn"><button id="pesquisar" class="btn btn-success" type="button">Pesquisar!</button></span>
+                </div>
+            </div>
+        </div>
+        <div class="row error {{if ne .HasError true}}message {{end}}header m-t-3">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-danger" role="alert">
+                    <strong>Ops!</strong> Aconteceu um erro ao processar a sua solicitação.
+                </div>
+            </div>
+        </div>
+        <div class="row invalid {{if ne .InvalidRequest true}}message{{end}} header m-t-3">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Ops!</strong> Digite termos com mais de 3 caracteres.
+                </div>
+            </div>
+        </div>
+    {{if ne .Index true}}
+				{{if .IPTUs}}
+        {{range .IPTUs}}
+        <div class="row result header">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header"><strong>{{.NomeContribuinte1}}</strong> (<strong>{{.TipoContribuinte1}}</strong> {{.DocContribuinte1}}){{if .NomeContribuinte2}} - <strong>{{.NomeContribuinte2}}</strong> {{if .TipoContribuinte2}}(<strong>{{.TipoContribuinte2}}</strong> {{.DocContribuinte2}}){{end}}{{end}}</div>
+                    <div class="card-block">
+                        <div class="row">
+														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
+                            <div class="col-sm-8"><strong>Endereço: </strong>{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}} - <strong>CEP:</strong> {{.CepImovel}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Ref.:</strong> {{.ReferenciaImovel}}</div>
+                            <div class="col-sm-4"><strong>Fração Ideal:</strong> {{.FracaoIdeal}}</div>
+                            <div class="col-sm-4"><strong>Ano Construção:</strong> {{.AnoConstrucaoCorrigido}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Área Terreno:</strong> {{.AreaTerreno}}</div>
+                            <div class="col-sm-4"><strong>Área Construida:</strong> {{.AreaConstruida}}</div>
+                            <div class="col-sm-4"><strong>Área Ocupada:</strong> {{.AreaOcupada}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4"><strong>Valor m<sup>2</sup> Terreno:</strong> {{.ValorM2Terreno}}</div>
+                            <div class="col-sm-4"><strong>Valor m<sup>2</sup> Construção:</strong> {{.ValorM2Construcao}}</div>
+														<div class="col-sm-4"><strong>Pavimentos:</strong> {{.QuantidadePavimentos}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">{{.TipoUsoImovel}} - {{.TipoPadraoConstrucao}} - {{.TipoTerreno}}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+				{{end}}
+        {{else}}
+        <div class="row noresults header m-t-3">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Ops!</strong> Nenhum resultado encontrado!
+                </div>
+            </div>
+        </div>
+        {{end}}
+    {{end}}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.2/js/bootstrap.min.js"></script>
+    <script>
+    (function(i, s, o, g, r, a, m) {
+        i['GoogleAnalyticsObject'] = r;
+        i[r] = i[r] || function() {
+            (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date();
+        a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    ga('create', 'UA-78908654-1', 'auto');
+    ga('send', 'pageview');
+
+    $(function() {
+        var convertToURL = function(text) {
+            return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+        };
+
+        $("#termos").keypress(function(e) {
+            if (e.which == 13) {
+                $("#pesquisar").click();
+            }
+        });
+        $("#pesquisar").click(function() {
+            window.location.href = "/" + convertToURL($("#termos").val());
+        });
+
+        $("#termos").focus();
+    });
+    </script>
+</body>
+
+</html>
+`
+
+type tplRender struct {
+	IPTUs          *[]api.IPTU
+	Index          bool
+	InvalidRequest bool
+	HasError       bool
+}
+
+// Render renders a Template based on the IPTUs
+func Render(IPTUs *[]api.IPTU, index bool, invalidRequest bool, hasError bool, wr io.Writer) {
+	template, err := template.New("tpl").Parse(tpl)
+	if err != nil {
+		log.Error.Println(err.Error())
+	}
+	err = template.Execute(wr, tplRender{
+		IPTUs:          IPTUs,
+		Index:          index,
+		InvalidRequest: invalidRequest,
+		HasError:       hasError,
+	})
+	if err != nil {
+		log.Error.Println(err.Error())
+	}
+}

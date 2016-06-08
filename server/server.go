@@ -1,137 +1,68 @@
 package server
 
 import (
-	"database/sql"
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"strings"
+
+	"bitbucket.org/terciofilho/iptu.go/api"
+	"bitbucket.org/terciofilho/iptu.go/log"
+	"bitbucket.org/terciofilho/iptu.go/render"
 )
 
-type iptu struct {
-	NumeroContribuinte     string
-	TipoContribuinte1      string
-	DocContribuinte1       string
-	NomeContribuinte1      string
-	TipoContribuinte2      string
-	DocContribuinte2       string
-	NomeContribuinte2      string
-	NomeLogradouroImovel   string
-	NumeroImovel           string
-	ComplementoImovel      string
-	BairroImovel           string
-	ReferenciaImovel       string
-	CepImovel              string
-	FracaoIdeal            float32
-	AreaTerreno            int
-	AreaConstruida         int
-	AreaOcupada            int
-	ValorM2Terreno         float32
-	ValorM2Construcao      float32
-	AnoConstrucaoCorrigido string
-	QuantidadePavimentos   int
-	TestadaCalculo         float32
-	TipoUsoImovel          string
-	TipoPadraoConstrucao   string
-	TipoTerreno            string
-	FatorObsolescencia     float32
-}
+// StartServer starts the webserver to handle the requests from the UI
+func StartServer() {
+	// handleStatic()
+	// handleAPI()
+	handlePesquisa()
 
-func (i iptu) String() string {
-	return fmt.Sprintf("numeroContribuinte: %s, tipoContribuinte1: %s, docContribuinte1: %s, nomeContribuinte1: %s, tipoContribuinte2: %s, docContribuinte2: %s, nomeContribuinte2: %s, nomeLogradouroImovel: %s, numeroImovel: %s, complementoImovel: %s, bairroImovel: %s, referenciaImovel: %s, cepImovel: %s, fracaoIdeal: %f, areaTerreno: %d, areaConstruida: %d, areaOcupada: %d, valorM2Terreno: %f, valorM2Construcao: %f, anoConstrucaoCorrigido: %s, quantidadePavimentos: %d, testadaCalculo: %f, tipoUsoImovel: %s, tipoPadraoConstrucao: %s, tipoTerreno: %s, fatorObsolescencia: %f", i.NumeroContribuinte, i.TipoContribuinte1, i.DocContribuinte1, i.NomeContribuinte1, i.TipoContribuinte2, i.DocContribuinte2, i.NomeContribuinte2, i.NomeLogradouroImovel, i.NumeroImovel, i.ComplementoImovel, i.BairroImovel, i.ReferenciaImovel, i.CepImovel, i.FracaoIdeal, i.AreaTerreno, i.AreaConstruida, i.AreaOcupada, i.ValorM2Terreno, i.ValorM2Construcao, i.AnoConstrucaoCorrigido, i.QuantidadePavimentos, i.TestadaCalculo, i.TipoUsoImovel, i.TipoPadraoConstrucao, i.TipoTerreno, i.FatorObsolescencia)
-}
-
-var (
-	db *sql.DB
-)
-
-// Server starts the webserver to handle the requests from the UI
-func Server(innerDb *sql.DB) {
-	db = innerDb
-
-	defer db.Close()
-
-	handleStatic()
-	handleAPI()
-
-	log.Println("WebServer started...")
+	log.Info.Println("WebServer started...")
 	http.ListenAndServe(":8080", nil)
-	log.Println("WebServer finished!")
 }
 
-func handleStatic() {
-	fs := http.FileServer(http.Dir("web"))
-	http.Handle("/", fs)
-}
+// func handleStatic() {
+// 	http.Handle("/", http.FileServer(http.Dir("web")))
+// }
 
-func handleAPI() {
-	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-		if err := r.ParseForm(); err != nil {
-			log.Printf("Error parsing: %s", err.Error())
-		}
-		termos := r.FormValue("termos")
-		termos = strings.Replace(termos, ".", " ", -1)
-		termos = strings.Replace(termos, ",", " ", -1)
-		termos = strings.Replace(termos, "-", " ", -1)
-		termos = strings.Replace(termos, "_", " ", -1)
-		termos = strings.TrimSpace(termos)
-		termosSlice := strings.Split(termos, " ")
+// func handleAPI() {
+// 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
+// 		if err := r.ParseForm(); err != nil {
+// 			log.Error.Printf("Error parsing: %s", err.Error())
+// 		}
+//
+// 		IPTUs, err := api.HandleRequest(r.FormValue("termos"))
+// 		if err != nil {
+//
+// 		}
+// 		if IPTUs == nil {
+// 			w.Write([]byte("[]"))
+// 		} else {
+// 			bytes, err := json.Marshal(&IPTUs)
+// 			if err != nil {
+// 				log.Error.Println(err.Error())
+// 			}
+// 			w.Write(bytes)
+// 		}
+// 	})
+// }
 
-		termosFT := ""
-		for _, value := range termosSlice {
-			// Only search for strings with at least 3 chars
-			if len(value) >= 3 {
-				termosFT += "+" + value + " "
-			}
+func handlePesquisa() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		url := r.URL.EscapedPath()[1:]
+		if strings.Contains(url, "/") {
+			http.Error(w, "", http.StatusBadRequest)
+			return
 		}
-		if len(termosFT) == 0 {
-			http.Error(w, "Os Termos devem conter ao menos 3 caracteres cada.", http.StatusBadRequest)
-		}
-		rows, err := db.Query("SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE (MATCH(`nome_contribuinte_1`,`nome_contribuinte_2`,`nome_logradouro_imovel`,`referencia_imovel`) AGAINST (? IN BOOLEAN MODE)) UNION SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE `doc_contribuinte_1` = ? OR `doc_contribuinte_2` = ? LIMIT 50", termosFT, termos, termos)
-		if err != nil {
-			panic(err.Error())
-		}
-		defer rows.Close()
-		var iptus []iptu
-		for rows.Next() {
-			row := iptu{}
-			rows.Scan(&row.NumeroContribuinte,
-				&row.TipoContribuinte1,
-				&row.DocContribuinte1,
-				&row.NomeContribuinte1,
-				&row.TipoContribuinte2,
-				&row.DocContribuinte2,
-				&row.NomeContribuinte2,
-				&row.NomeLogradouroImovel,
-				&row.NumeroImovel,
-				&row.ComplementoImovel,
-				&row.BairroImovel,
-				&row.ReferenciaImovel,
-				&row.CepImovel,
-				&row.FracaoIdeal,
-				&row.AreaTerreno,
-				&row.AreaConstruida,
-				&row.AreaOcupada,
-				&row.ValorM2Terreno,
-				&row.ValorM2Construcao,
-				&row.AnoConstrucaoCorrigido,
-				&row.QuantidadePavimentos,
-				&row.TestadaCalculo,
-				&row.TipoUsoImovel,
-				&row.TipoPadraoConstrucao,
-				&row.TipoTerreno,
-				&row.FatorObsolescencia)
-			iptus = append(iptus, row)
-		}
-		if iptus == nil {
-			w.Write([]byte("[]"))
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		termos := strings.Replace(url, "-", " ", -1)
+		if len(termos) == 0 {
+			render.Render(nil, true, false, false, w)
 		} else {
-			bytes, err := json.Marshal(&iptus)
+			IPTUs, err := api.HandleRequest(termos)
 			if err != nil {
-				panic(err.Error())
+				render.Render(nil, false, err.Invalid, err.HasError, w)
+			} else {
+				render.Render(IPTUs, false, false, false, w)
 			}
-			w.Write(bytes)
 		}
 	})
 }
