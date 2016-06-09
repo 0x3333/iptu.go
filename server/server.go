@@ -59,6 +59,7 @@ func handlePesquisa() {
 		} else {
 			IPTUs, err := api.HandleRequest(termos)
 			if err != nil {
+				log.Error.Println(err.Message)
 				render.Render(nil, false, err.Invalid, err.HasError, w)
 			} else {
 				render.Render(IPTUs, false, false, false, w)

@@ -41,8 +41,9 @@ const tpl = `
         </div>
         <div class="row header m-y-1">
             <div class="col-sm-offset-2 col-sm-8">
+								<h5><span class="label label-default hidden-lg-up">Nome/CNPJ/CPF/Logradouro:</span></h5>
                 <div class="input-group">
-                    <span class="input-group-addon">Nome/CNPJ/CPF/Logradouro:</span>
+                    <span class="input-group-addon hidden-md-down">Nome/CNPJ/CPF/Logradouro:</span>
                     <input id="termos" type="text" class="form-control" placeholder="Digite os termos da busca">
                     <span class="input-group-btn"><button id="pesquisar" class="btn btn-success" type="button">Pesquisar!</button></span>
                 </div>
@@ -54,7 +55,14 @@ const tpl = `
                     <strong>Ops!</strong> Aconteceu um erro ao processar a sua solicitação.
                 </div>
             </div>
-        </div>
+        </div>{{if eq .IsLimited true}}
+        <div class="row invalid header m-t-1">
+            <div class="col-sm-offset-3 col-sm-6">
+                <div class="alert alert-warning" role="alert">
+                    <strong>Ops!</strong> Os resultados foram limitados, seja mais específico na pesquisa.
+                </div>
+            </div>
+        </div>{{end}}
         <div class="row invalid {{if ne .InvalidRequest true}}message{{end}} header m-t-3">
             <div class="col-sm-offset-3 col-sm-6">
                 <div class="alert alert-warning" role="alert">
@@ -72,7 +80,9 @@ const tpl = `
                     <div class="card-block">
                         <div class="row">
 														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
-                            <div class="col-sm-8"><strong>Endereço: </strong>{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}} - <strong>CEP:</strong> {{.CepImovel}}</div>
+                            <div class="col-sm-8"><strong>Endereço: </strong>{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}} - <strong>CEP:</strong> {{.CepImovel}}
+														<a href="javascript:openGoogleMaps('{{.NomeLogradouroImovel}}, {{.NumeroImovel}}, São Paulo - SP');"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
+														</div>
                         </div>
                         <div class="row">
                             <div class="col-sm-4"><strong>Ref.:</strong> {{.ReferenciaImovel}}</div>
@@ -127,11 +137,16 @@ const tpl = `
     ga('create', 'UA-78908654-1', 'auto');
     ga('send', 'pageview');
 
-    $(function() {
-        var convertToURL = function(text) {
-            return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-        };
+		function convertToURL(text) {
+				return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+		}
 
+		function openGoogleMaps(address) {
+			var url = "http://maps.google.com/?q=" + encodeURIComponent(address)
+			window.open(url, "_blank")
+		}
+
+    $(function() {
         $("#termos").keypress(function(e) {
             if (e.which == 13) {
                 $("#pesquisar").click();
@@ -153,6 +168,7 @@ type tplRender struct {
 	IPTUs          *[]api.IPTU
 	Index          bool
 	InvalidRequest bool
+	IsLimited      bool
 	HasError       bool
 }
 
@@ -162,10 +178,15 @@ func Render(IPTUs *[]api.IPTU, index bool, invalidRequest bool, hasError bool, w
 	if err != nil {
 		log.Error.Println(err.Error())
 	}
+	isLimited := false
+	if IPTUs != nil {
+		isLimited = len(*IPTUs) == api.LimitSize
+	}
 	err = template.Execute(wr, tplRender{
 		IPTUs:          IPTUs,
 		Index:          index,
 		InvalidRequest: invalidRequest,
+		IsLimited:      isLimited,
 		HasError:       hasError,
 	})
 	if err != nil {

@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"bitbucket.org/terciofilho/iptu.go/db"
@@ -43,12 +44,17 @@ func (i IPTU) String() string {
 	return fmt.Sprintf("numeroContribuinte: %s, tipoContribuinte1: %s, docContribuinte1: %s, nomeContribuinte1: %s, tipoContribuinte2: %s, docContribuinte2: %s, nomeContribuinte2: %s, nomeLogradouroImovel: %s, numeroImovel: %s, complementoImovel: %s, bairroImovel: %s, referenciaImovel: %s, cepImovel: %s, fracaoIdeal: %f, areaTerreno: %d, areaConstruida: %d, areaOcupada: %d, valorM2Terreno: %f, valorM2Construcao: %f, anoConstrucaoCorrigido: %s, quantidadePavimentos: %d, testadaCalculo: %f, tipoUsoImovel: %s, tipoPadraoConstrucao: %s, tipoTerreno: %s, fatorObsolescencia: %f", i.NumeroContribuinte, i.TipoContribuinte1, i.DocContribuinte1, i.NomeContribuinte1, i.TipoContribuinte2, i.DocContribuinte2, i.NomeContribuinte2, i.NomeLogradouroImovel, i.NumeroImovel, i.ComplementoImovel, i.BairroImovel, i.ReferenciaImovel, i.CepImovel, i.FracaoIdeal, i.AreaTerreno, i.AreaConstruida, i.AreaOcupada, i.ValorM2Terreno, i.ValorM2Construcao, i.AnoConstrucaoCorrigido, i.QuantidadePavimentos, i.TestadaCalculo, i.TipoUsoImovel, i.TipoPadraoConstrucao, i.TipoTerreno, i.FatorObsolescencia)
 }
 
+// LimitSize is the size used in the LIMIT SQL query
+const LimitSize = 50
+
 var (
-	regex1 = regexp.MustCompile(`(\d{1})[,\.\-\/ ]+(\d{1})`)
-	regex2 = regexp.MustCompile(`[,\.\-\/]+`)
-	regex3 = regexp.MustCompile(`\b[^ ]{1,2}\b`)
-	regex4 = regexp.MustCompile(`[ ]+`)
-	regex5 = regexp.MustCompile(`\s([^ ]+)`)
+	regex1    = regexp.MustCompile(`(\d{1})[,\.\-\/ ]+(\d{1})`)
+	regex2    = regexp.MustCompile(`[,\.\-\/]+`)
+	regex3    = regexp.MustCompile(`\b[^ ]{1,2}\b`)
+	regex4    = regexp.MustCompile(`[ ]+`)
+	regex5    = regexp.MustCompile(`\s([^ ]+)`)
+	regexCNPJ = regexp.MustCompile(`(..)(...)(...)(....)(..)`)
+	regexCPF  = regexp.MustCompile(`(...)(...)(...)(..)`)
 )
 
 // RequestError represents a Request error
@@ -84,7 +90,7 @@ func HandleRequest(termos string) (*[]IPTU, *RequestError) {
 		}
 	}
 
-	rows, err := db.Instance.Query("SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE (MATCH(`nome_contribuinte_1`,`nome_contribuinte_2`,`nome_logradouro_imovel`,`referencia_imovel`) AGAINST (? IN BOOLEAN MODE)) UNION SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE `doc_contribuinte_1` = ? OR `doc_contribuinte_2` = ? ORDER BY nome_contribuinte_1, nome_contribuinte_2 LIMIT 50", termosFT, termos, termos)
+	rows, err := db.Instance.Query("SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE (MATCH(`nome_contribuinte_1`,`nome_contribuinte_2`,`nome_logradouro_imovel`,`referencia_imovel`) AGAINST (? IN BOOLEAN MODE)) UNION SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE `doc_contribuinte_1` = ? OR `doc_contribuinte_2` = ? LIMIT "+strconv.Itoa(LimitSize), termosFT, termos, termos)
 	if err != nil {
 		return nil, &RequestError{
 			HasError: true,
@@ -121,6 +127,16 @@ func HandleRequest(termos string) (*[]IPTU, *RequestError) {
 			&row.TipoPadraoConstrucao,
 			&row.TipoTerreno,
 			&row.FatorObsolescencia)
+		if len(row.DocContribuinte1) == 14 {
+			row.DocContribuinte1 = regexCNPJ.ReplaceAllString(row.DocContribuinte1, "$1.$2.$3/$4-$5")
+		} else if len(row.DocContribuinte1) == 11 {
+			row.DocContribuinte1 = regexCPF.ReplaceAllString(row.DocContribuinte1, "$1.$2.$3-$4")
+		}
+		if len(row.DocContribuinte2) == 14 {
+			row.DocContribuinte2 = regexCNPJ.ReplaceAllString(row.DocContribuinte2, "$1.$2.$3/$4-$5")
+		} else if len(row.DocContribuinte2) == 11 {
+			row.DocContribuinte2 = regexCPF.ReplaceAllString(row.DocContribuinte2, "$1.$2.$3-$4")
+		}
 		result = append(result, row)
 	}
 	if result == nil {
