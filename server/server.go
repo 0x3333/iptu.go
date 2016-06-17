@@ -35,8 +35,7 @@ func handlePesquisa() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Redireciona para o domínio sem www(Qualquer dominio diferente de 'consultaiptu.com.br')
 		domainParts := strings.Split(r.Host, ".")
-		if len(domainParts) != 3 || domainParts[0] != "consultaiptu" || domainParts[1] == "com" || domainParts[2] == "br" {
-			println("http://consultaiptu.com.br" + r.URL.EscapedPath())
+		if len(domainParts) != 3 || domainParts[0] != "consultaiptu" {
 			http.Redirect(w, r, "http://consultaiptu.com.br"+r.URL.EscapedPath(), http.StatusMovedPermanently)
 			return
 		}
