@@ -24,10 +24,8 @@ func StartServer() {
 func handleStatic() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.EscapedPath() == "/" {
-			log.Info.Println("Redirect Index")
 			http.Redirect(w, r, "/s/", http.StatusMovedPermanently)
 		} else {
-			log.Info.Printf("Serving file: %s", r.URL.Path)
 			http.ServeFile(w, r, "web/"+r.URL.Path[1:])
 		}
 	})
