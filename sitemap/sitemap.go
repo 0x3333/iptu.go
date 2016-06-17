@@ -16,7 +16,7 @@ import (
 
 const (
 	maxRecordCount    = 2500000
-	maxRecordsPerPage = 100000
+	maxRecordsPerPage = 49999
 
 	tplSitemaps = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{{ $LastModify := .LastModify }}{{range $index, $element := .Docs}}

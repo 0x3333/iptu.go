@@ -2,11 +2,13 @@ package server
 
 import (
 	"net/http"
+	"os"
 	"strings"
 
 	"bitbucket.org/terciofilho/iptu.go/api"
 	"bitbucket.org/terciofilho/iptu.go/log"
 	"bitbucket.org/terciofilho/iptu.go/render"
+	"github.com/ajays20078/go-http-logger"
 	"github.com/nytimes/gziphandler"
 )
 
@@ -16,7 +18,7 @@ func StartServer() {
 	handlePesquisa()
 
 	log.Info.Println("WebServer started...")
-	http.ListenAndServe(":8080", nil)
+	http.ListenAndServe(":8080", httpLogger.WriteLog(http.DefaultServeMux, os.Stdout))
 }
 
 func handleStatic() {

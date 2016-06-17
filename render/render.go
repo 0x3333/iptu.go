@@ -174,7 +174,7 @@ func Render(IPTUs *[]api.IPTU, index bool, invalidRequest bool, hasError bool, w
 	}
 	isLimited := false
 	if IPTUs != nil {
-		isLimited = len(*IPTUs) == api.LimitSize
+		isLimited = len(*IPTUs) >= api.LimitSize
 	}
 	err = template.Execute(wr, tplRender{
 		IPTUs:          IPTUs,
