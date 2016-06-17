@@ -29,7 +29,6 @@ const tpl = `
 </head>
 
 <body>
-    <div class="div-fake-hidden"><i class="fa fa-circle-o-notch fa-spin fa-spin-2x fa-2x fa-fw"></i></div>
     <div class="container">
         <div class="row header m-t-3">
             <div class="col-sm-12">
@@ -81,7 +80,7 @@ const tpl = `
                         <div class="row">
 														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
                             <div class="col-sm-8"><strong>Endereço: </strong>{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}} - <strong>CEP:</strong> {{.CepImovel}}
-														<a href="javascript:openGoogleMaps('{{.NomeLogradouroImovel}}, {{.NumeroImovel}}, São Paulo - SP');"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
+														<a href="http://maps.google.com/?q={{ .URLMaps }}"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
 														</div>
                         </div>
                         <div class="row">
@@ -141,11 +140,6 @@ const tpl = `
 				return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
 		}
 
-		function openGoogleMaps(address) {
-			var url = "http://maps.google.com/?q=" + encodeURIComponent(address)
-			window.open(url, "_blank")
-		}
-
     $(function() {
         $("#termos").keypress(function(e) {
             if (e.which == 13) {
@@ -153,7 +147,7 @@ const tpl = `
             }
         });
         $("#pesquisar").click(function() {
-            window.location.href = "/" + convertToURL($("#termos").val());
+            window.location.href = "/s/" + convertToURL($("#termos").val());
         });
 
         $("#termos").focus();

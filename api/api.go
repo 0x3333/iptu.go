@@ -38,6 +38,7 @@ type IPTU struct {
 	TipoPadraoConstrucao   string
 	TipoTerreno            string
 	FatorObsolescencia     float32
+	URLMaps                string
 }
 
 func (i IPTU) String() string {
@@ -45,7 +46,7 @@ func (i IPTU) String() string {
 }
 
 // LimitSize is the size used in the LIMIT SQL query
-const LimitSize = 50
+const LimitSize = 200
 
 var (
 	regex1    = regexp.MustCompile(`(\d{1})[,\.\-\/ ]+(\d{1})`)
@@ -137,6 +138,7 @@ func HandleRequest(termos string) (*[]IPTU, *RequestError) {
 		} else if len(row.DocContribuinte2) == 11 {
 			row.DocContribuinte2 = regexCPF.ReplaceAllString(row.DocContribuinte2, "$1.$2.$3-$4")
 		}
+		row.URLMaps = fmt.Sprintf("%s, %s, São Paulo - SP", row.NomeLogradouroImovel, row.NumeroImovel)
 		result = append(result, row)
 	}
 	if result == nil {

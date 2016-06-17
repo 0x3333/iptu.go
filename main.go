@@ -7,6 +7,7 @@ import (
 	"bitbucket.org/terciofilho/iptu.go/importer"
 	"bitbucket.org/terciofilho/iptu.go/log"
 	"bitbucket.org/terciofilho/iptu.go/server"
+	"bitbucket.org/terciofilho/iptu.go/sitemap"
 )
 
 func main() {
@@ -14,6 +15,7 @@ func main() {
 	importPtr := flag.String("import", "", "Import IPTU CSV")
 	serverPtr := flag.Bool("server", false, "Start a WebServer to handle requests and serve static resources")
 	dryRunPtr := flag.Bool("dryrun", false, "Dry run usage, doesn't alter the database")
+	sitemapPtr := flag.Bool("sitemap", false, "Generate Sitemap files")
 	flag.Parse()
 
 	// Importer
@@ -25,6 +27,10 @@ func main() {
 		log.Info.Println("Starting as a Importer...")
 		db.ConnectDb()
 		importer.RunImport(*importPtr, *dryRunPtr)
+	} else if *sitemapPtr {
+		log.Info.Println("Starting as Sitemap...")
+		db.ConnectDb()
+		sitemap.Generate()
 	} else {
 		flag.Usage()
 	}

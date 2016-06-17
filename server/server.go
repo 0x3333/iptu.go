@@ -7,49 +7,42 @@ import (
 	"bitbucket.org/terciofilho/iptu.go/api"
 	"bitbucket.org/terciofilho/iptu.go/log"
 	"bitbucket.org/terciofilho/iptu.go/render"
+	"github.com/nytimes/gziphandler"
 )
 
 // StartServer starts the webserver to handle the requests from the UI
 func StartServer() {
-	// handleStatic()
-	// handleAPI()
+	handleStatic()
 	handlePesquisa()
 
 	log.Info.Println("WebServer started...")
 	http.ListenAndServe(":8080", nil)
 }
 
-// func handleStatic() {
-// 	http.Handle("/", http.FileServer(http.Dir("web")))
-// }
-
-// func handleAPI() {
-// 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-// 		if err := r.ParseForm(); err != nil {
-// 			log.Error.Printf("Error parsing: %s", err.Error())
-// 		}
-//
-// 		IPTUs, err := api.HandleRequest(r.FormValue("termos"))
-// 		if err != nil {
-//
-// 		}
-// 		if IPTUs == nil {
-// 			w.Write([]byte("[]"))
-// 		} else {
-// 			bytes, err := json.Marshal(&IPTUs)
-// 			if err != nil {
-// 				log.Error.Println(err.Error())
-// 			}
-// 			w.Write(bytes)
-// 		}
-// 	})
-// }
+func handleStatic() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.EscapedPath() == "/" {
+			log.Info.Println("Redirect Index")
+			http.Redirect(w, r, "/s/", http.StatusMovedPermanently)
+		} else {
+			log.Info.Printf("Serving file: %s", r.URL.Path)
+			http.ServeFile(w, r, "web/"+r.URL.Path[1:])
+		}
+	})
+}
 
 func handlePesquisa() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		url := r.URL.EscapedPath()[1:]
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Redireciona para o domínio sem www(Qualquer dominio diferente de 'consultaiptu.com.br')
+		domainParts := strings.Split(r.Host, ".")
+		if len(domainParts) != 3 || domainParts[0] != "consultaiptu" || domainParts[1] == "com" || domainParts[2] == "br" {
+			println("http://consultaiptu.com.br" + r.URL.EscapedPath())
+			http.Redirect(w, r, "http://consultaiptu.com.br"+r.URL.EscapedPath(), http.StatusMovedPermanently)
+			return
+		}
+		url := r.URL.EscapedPath()[3:]
 		if strings.Contains(url, "/") {
-			http.Error(w, "", http.StatusBadRequest)
+			http.Error(w, "400 - Bad Request", http.StatusBadRequest)
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -66,4 +59,6 @@ func handlePesquisa() {
 			}
 		}
 	})
+	handlerGz := gziphandler.GzipHandler(handler)
+	http.Handle("/s/", handlerGz)
 }
