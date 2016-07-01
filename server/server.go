@@ -34,11 +34,11 @@ func handleStatic() {
 func handlePesquisa() {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// Redireciona para o domínio sem www(Qualquer dominio diferente de 'consultaiptu.com.br')
-		domainParts := strings.Split(r.Host, ".")
-		if len(domainParts) != 3 || domainParts[0] != "consultaiptu" {
-			http.Redirect(w, r, "http://consultaiptu.com.br"+r.URL.EscapedPath(), http.StatusMovedPermanently)
-			return
-		}
+		//domainParts := strings.Split(r.Host, ".")
+		//if len(domainParts) != 3 || domainParts[0] != "consultaiptu" {
+		//	http.Redirect(w, r, "http://consultaiptu.com.br"+r.URL.EscapedPath(), http.StatusMovedPermanently)
+		//	return
+		//}
 		url := r.URL.EscapedPath()[3:]
 		if strings.Contains(url, "/") {
 			http.Error(w, "400 - Bad Request", http.StatusBadRequest)

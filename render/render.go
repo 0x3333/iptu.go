@@ -22,7 +22,18 @@ const tpl = `
     <title>Consulta de Contribuintes do IPTU - São Paulo - SP</title>
 
     <style>
-        .row.message {
+				body {
+						margin-bottom: 35px;
+				}
+				.footer {
+					  position: fixed;
+					  bottom: 0;
+					  width: 100%;
+					  height: 35px;
+					  line-height: 35px;
+					  background-color: #f5f5f5;
+				}
+				.row.message {
             display: none;
         }
     </style>
@@ -74,12 +85,12 @@ const tpl = `
         {{range .IPTUs}}
         <div class="row result header">
             <div class="col-sm-12">
-                <div class="card">
-                    <div class="card-header"><strong>{{.NomeContribuinte1}}</strong> (<strong>{{.TipoContribuinte1}}</strong> {{.DocContribuinte1}}){{if .NomeContribuinte2}} - <strong>{{.NomeContribuinte2}}</strong> {{if .TipoContribuinte2}}(<strong>{{.TipoContribuinte2}}</strong> {{.DocContribuinte2}}){{end}}{{end}}</div>
+                <div class="card" itemscope itemtype="http://schema.org/Person">
+                    <div class="card-header"><strong itemprop="name">{{.NomeContribuinte1}}</strong> (<strong>{{.TipoContribuinte1}}</strong> <span itemprop="taxID">{{.DocContribuinte1}}</span>){{if .NomeContribuinte2}} - <strong itemprop="name">{{.NomeContribuinte2}}</strong> {{if .TipoContribuinte2}}(<strong>{{.TipoContribuinte2}}</strong> <span itemprop="taxID">{{.DocContribuinte2}}</span>){{end}}{{end}}</div>
                     <div class="card-block">
                         <div class="row">
 														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
-                            <div class="col-sm-8"><strong>Endereço: </strong>{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}} - <strong>CEP:</strong> {{.CepImovel}}
+                            <div class="col-sm-8"><strong>Endereço: </strong><span itemprop="address">{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}}</span> - <strong>CEP:</strong> {{.CepImovel}}
 														<a href="http://maps.google.com/?q={{ .URLMaps }}"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
 														</div>
                         </div>
@@ -117,6 +128,12 @@ const tpl = `
         {{end}}
     {{end}}
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <small><span class="text-muted"><a href="http://diariooficial.imprensaoficial.com.br/doflash/prototipo/2016/Abril/14/cidade/pdf/pg_0001.pdf" target="_blank">Diário Oficial</a> - Decreto Nº 56.932, de 13 de abril de 2016</span></small>
+        </div>
+    </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
