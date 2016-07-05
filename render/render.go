@@ -131,7 +131,7 @@ const tpl = `
 
     <footer class="footer">
         <div class="container">
-            <small><span class="text-muted"><a href="http://diariooficial.imprensaoficial.com.br/doflash/prototipo/2016/Abril/14/cidade/pdf/pg_0001.pdf" target="_blank">Diário Oficial</a> - Decreto Nº 56.932, de 13 de abril de 2016</span></small>
+            <small><span class="text-muted">Dados disponibilizados pela Prefeitura de São Paulo conforme Decreto Nº 56.932, de 13 de abril de 2016 - <a href="http://diariooficial.imprensaoficial.com.br/doflash/prototipo/2016/Abril/14/cidade/pdf/pg_0001.pdf" target="_blank">Diário Oficial</a></span></small>
         </div>
     </footer>
 
