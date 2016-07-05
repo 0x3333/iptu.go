@@ -45,7 +45,7 @@ func (i IPTU) String() string {
 }
 
 // LimitSize is the size used in the LIMIT SQL query
-const LimitSize = 200
+const LimitSize = 150
 
 var (
 	regex1    = regexp.MustCompile(`(\d{1})[,\.\-\/ ]+(\d{1})`)
@@ -83,7 +83,7 @@ func HandleRequest(termos string) (*[]IPTU, *RequestError) {
 
 	//log.Info.Printf("Termos: '%s' - TermosFT: '%s'", termos, termosFT)
 
-	rows, err := db.Instance.Query("SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE (MATCH(`nome_contribuinte_1`,`nome_contribuinte_2`,`nome_logradouro_imovel`,`referencia_imovel`) AGAINST (? IN BOOLEAN MODE)) UNION SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE `doc_contribuinte_1` = ? OR `doc_contribuinte_2` = ? LIMIT "+strconv.Itoa(LimitSize), termosFT, termos, termos)
+	rows, err := db.Instance.Query("(SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE visivel = 1 AND (MATCH(`nome_contribuinte_1`,`nome_contribuinte_2`,`nome_logradouro_imovel`,`referencia_imovel`) AGAINST (? IN BOOLEAN MODE)) LIMIT "+strconv.Itoa(LimitSize)+") UNION (SELECT numero_contribuinte,tipo_contribuinte_1,doc_contribuinte_1,nome_contribuinte_1,tipo_contribuinte_2,doc_contribuinte_2,nome_contribuinte_2,nome_logradouro_imovel,numero_imovel,complemento_imovel,bairro_imovel,referencia_imovel,cep_imovel,fracao_ideal,area_terreno,area_construida,area_ocupada,valor_m2_terreno,valor_m2_construcao,ano_construcao_corrigido,quantidade_pavimentos,testada_calculo,tipo_uso_imovel,tipo_padrao_construcao,tipo_terreno,fator_obsolescencia FROM `iptu` WHERE visivel = 1 AND `doc_contribuinte_1` = ? OR `doc_contribuinte_2` = ? LIMIT "+strconv.Itoa(LimitSize)+") ORDER BY nome_contribuinte_1, nome_contribuinte_2", termosFT, termos, termos)
 	if err != nil {
 		return nil, &RequestError{
 			HasError: true,
