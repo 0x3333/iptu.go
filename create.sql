@@ -34,6 +34,7 @@ CREATE TABLE `iptu` (
   `ano_inicio_vida_contribuinte` varchar(4) DEFAULT NULL,
   `mes_inicio_vida_contribuinte` varchar(2) DEFAULT NULL,
   `fase_contribuinte` varchar(1) DEFAULT NULL,
+  `visivel` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`numero_contribuinte`),
   UNIQUE KEY `numero_contribuinte` (`numero_contribuinte`),
   KEY `doc_contribuinte_1` (`doc_contribuinte_1`),

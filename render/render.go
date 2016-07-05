@@ -150,7 +150,7 @@ const tpl = `
         a.src = g;
         m.parentNode.insertBefore(a, m)
     })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-    ga('create', 'UA-78908654-1', 'auto');
+    ga('create', 'UA-80338230-1', 'auto');
     ga('send', 'pageview');
 
 		function convertToURL(text) {

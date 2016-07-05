@@ -21,11 +21,11 @@ const (
 	tplSitemaps = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{{ $LastModify := .LastModify }}{{range $index, $element := .Docs}}
   <sitemap>
-    <loc>http://consultaiptu.com.br/sitemaps/docs_{{ $index }}.xml.gz</loc>
+    <loc>http://consultaiptu.com/sitemaps/docs_{{ $index }}.xml.gz</loc>
     <lastmod>{{ $LastModify }}</lastmod>
   </sitemap>{{ else }}{{ end }}{{range $index, $element := .Nomes}}
   <sitemap>
-    <loc>http://consultaiptu.com.br/sitemaps/nomes_{{ $index }}.xml.gz</loc>
+    <loc>http://consultaiptu.com/sitemaps/nomes_{{ $index }}.xml.gz</loc>
     <lastmod>{{ $LastModify }}</lastmod>
   </sitemap>{{ else }}{{ end }}
 </sitemapindex>
@@ -34,7 +34,7 @@ const (
 	tplDocs = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{{ $LastModify := .LastModify }}{{ range .Docs }}
   <url>
-    <loc>http://consultaiptu.com.br/s/{{ . }}</loc>
+    <loc>http://consultaiptu.com/s/{{ . }}</loc>
     <lastmod>{{ $LastModify }}</lastmod>
     <changefreq>monthly</changefreq>
   </url>{{ end }}
@@ -44,7 +44,7 @@ const (
 	tplNomes = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{{ $LastModify := .LastModify }}{{ range .Nomes }}
   <url>
-    <loc>http://consultaiptu.com.br/s/{{ . }}</loc>
+    <loc>http://consultaiptu.com/s/{{ . }}</loc>
     <lastmod>{{ $LastModify }}</lastmod>
     <changefreq>monthly</changefreq>
   </url>{{end}}

@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: http://consultaiptu.com.br/sitemaps/sitemap.xml
+Sitemap: http://consultaiptu.com/sitemaps/sitemap.xml
