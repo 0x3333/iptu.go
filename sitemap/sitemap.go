@@ -87,7 +87,7 @@ func Generate() {
 	//
 
 	log.Info.Println("Starting Documentos...")
-	rows, err := db.Instance.Query("SELECT `doc_contribuinte_1` as doc_contribuinte FROM iptu WHERE `doc_contribuinte_1` != \"\" GROUP BY `doc_contribuinte_1` UNION DISTINCT SELECT `doc_contribuinte_2` as doc_contribuinte FROM iptu WHERE `doc_contribuinte_2` != \"\" GROUP BY `doc_contribuinte_2`")
+	rows, err := db.Instance.Query("SELECT `doc_contribuinte_1` as doc_contribuinte FROM iptu WHERE `doc_contribuinte_1` != \"\" GROUP BY `doc_contribuinte_1` UNION DISTINCT SELECT `doc_contribuinte_2` as doc_contribuinte FROM iptu WHERE `visivel` = 1 AND `doc_contribuinte_2` != \"\" GROUP BY `doc_contribuinte_2`")
 	if err != nil {
 		log.Error.Printf("Failed to query database: %s", err.Error())
 	}
@@ -134,7 +134,7 @@ func Generate() {
 	//
 
 	log.Info.Println("Starting Nomes...")
-	rows, err = db.Instance.Query("SELECT `nome_contribuinte_1` as nome_contribuinte FROM iptu WHERE `nome_contribuinte_1` != \"\" GROUP BY `nome_contribuinte_1` UNION DISTINCT SELECT `nome_contribuinte_2` as nome_contribuinte FROM iptu WHERE `nome_contribuinte_2` != \"\" GROUP BY `nome_contribuinte_2`")
+	rows, err = db.Instance.Query("SELECT `nome_contribuinte_1` as nome_contribuinte FROM iptu WHERE `nome_contribuinte_1` != \"\" GROUP BY `nome_contribuinte_1` UNION DISTINCT SELECT `nome_contribuinte_2` as nome_contribuinte FROM iptu WHERE `visivel` = 1 AND `nome_contribuinte_2` != \"\" GROUP BY `nome_contribuinte_2`")
 	if err != nil {
 		log.Error.Printf("Failed to query database: %s", err.Error())
 	}
