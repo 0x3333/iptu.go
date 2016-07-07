@@ -13,31 +13,14 @@ import (
 
 // StartServer starts the webserver to handle the requests from the UI
 func StartServer() {
-	handleStatic()
 	handlePesquisa()
 
 	log.Info.Println("WebServer started...")
 	http.ListenAndServe(":8080", httpLogger.WriteLog(http.DefaultServeMux, os.Stdout))
 }
 
-func handleStatic() {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.EscapedPath() == "/" {
-			http.Redirect(w, r, "/s/", http.StatusMovedPermanently)
-		} else {
-			http.ServeFile(w, r, "web/"+r.URL.Path[1:])
-		}
-	})
-}
-
 func handlePesquisa() {
 	http.HandleFunc("/s/", func(w http.ResponseWriter, r *http.Request) {
-		// Redireciona para o domínio sem www(Qualquer dominio diferente de 'consultaiptu.com.br')
-		//domainParts := strings.Split(r.Host, ".")
-		//if len(domainParts) != 3 || domainParts[0] != "consultaiptu" {
-		//	http.Redirect(w, r, "http://consultaiptu.com.br"+r.URL.EscapedPath(), http.StatusMovedPermanently)
-		//	return
-		//}
 		url := r.URL.EscapedPath()[3:] // Remove o /s/ da URL
 		if strings.Contains(url, "/") {
 			http.Error(w, "400 - Bad Request", http.StatusBadRequest)

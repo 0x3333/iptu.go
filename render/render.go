@@ -91,7 +91,7 @@ const tpl = `
                         <div class="row">
 														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
                             <div class="col-sm-8"><strong>Endereço: </strong><span itemprop="address">{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}}</span> - <strong>CEP:</strong> {{.CepImovel}}
-														<a href="http://maps.google.com/?q={{ .URLMaps }}"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
+														<a href="http://maps.google.com/?q={{ .URLMaps }}" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
 														</div>
                         </div>
                         <div class="row">
