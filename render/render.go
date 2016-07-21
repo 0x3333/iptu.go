@@ -23,14 +23,12 @@ const tpl = `
 
     <style>
 				body {
-						margin-bottom: 35px;
+						margin-bottom: 60px;
 				}
 				.footer {
 					  position: fixed;
 					  bottom: 0;
 					  width: 100%;
-					  height: 35px;
-					  line-height: 35px;
 					  background-color: #f5f5f5;
 				}
 				.row.message {
