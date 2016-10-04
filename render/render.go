@@ -22,17 +22,20 @@ const tpl = `
     <title>Consulta de Contribuintes do IPTU - São Paulo - SP</title>
 
     <style>
-				body {
-						margin-bottom: 60px;
-				}
-				.footer {
-					  position: fixed;
-					  bottom: 0;
-					  width: 100%;
-					  background-color: #f5f5f5;
-				}
-				.row.message {
+        body {
+            margin-bottom: 60px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+        }
+        .row.message {
             display: none;
+        }
+        .lead {
+            margin: 0;
         }
     </style>
 </head>
@@ -44,12 +47,13 @@ const tpl = `
                 <div class="jumbotron text-xs-center m-b-0">
                     <h1 class="display-3">Consulta IPTU</h1>
                     <p class="lead">Aqui você pode consultar pelos Contribuintes de IPTU da Cidade de São Paulo</p>
+                    <p>Os dados aqui presentes, são <strong>públicos</strong>, divulgados pela Prefeitura de São Paulo.</p>
                 </div>
             </div>
         </div>
         <div class="row header m-y-1">
             <div class="col-sm-offset-2 col-sm-8">
-								<h5><span class="label label-default hidden-lg-up">Nome/CNPJ/CPF/Logradouro:</span></h5>
+                <h5><span class="label label-default hidden-lg-up">Nome/CNPJ/CPF/Logradouro:</span></h5>
                 <div class="input-group">
                     <span class="input-group-addon hidden-md-down">Nome/CNPJ/CPF/Logradouro:</span>
                     <input id="termos" type="text" class="form-control" placeholder="Digite os termos da busca">
@@ -79,7 +83,7 @@ const tpl = `
             </div>
         </div>
     {{if ne .Index true}}
-				{{if .IPTUs}}
+        {{if .IPTUs}}
         {{range .IPTUs}}
         <div class="row result header">
             <div class="col-sm-12">
@@ -87,10 +91,10 @@ const tpl = `
                     <div class="card-header"><strong itemprop="name">{{.NomeContribuinte1}}</strong> (<strong>{{.TipoContribuinte1}}</strong> <span itemprop="taxID">{{.DocContribuinte1}}</span>){{if .NomeContribuinte2}} - <strong itemprop="name">{{.NomeContribuinte2}}</strong> {{if .TipoContribuinte2}}(<strong>{{.TipoContribuinte2}}</strong> <span itemprop="taxID">{{.DocContribuinte2}}</span>){{end}}{{end}}</div>
                     <div class="card-block">
                         <div class="row">
-														<div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
+                            <div class="col-sm-4"><strong>N. Contribuinte:</strong> {{.NumeroContribuinte}}</div>
                             <div class="col-sm-8"><strong>Endereço: </strong><span itemprop="address">{{.NomeLogradouroImovel}}, {{.NumeroImovel}}{{if .ComplementoImovel}} - {{.ComplementoImovel}}{{end}}, {{.BairroImovel}}</span> - <strong>CEP:</strong> {{.CepImovel}}
-														<a href="http://maps.google.com/?q={{ .URLMaps }}" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
-														</div>
+                            <a href="http://maps.google.com/?q={{ .URLMaps }}" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/en/1/19/Google_Maps_Icon.png" width="32" height="32"></a>
+                            </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-4"><strong>Ref.:</strong> {{.ReferenciaImovel}}</div>
@@ -105,7 +109,7 @@ const tpl = `
                         <div class="row">
                             <div class="col-sm-4"><strong>Valor m<sup>2</sup> Terreno:</strong> {{.ValorM2Terreno}}</div>
                             <div class="col-sm-4"><strong>Valor m<sup>2</sup> Construção:</strong> {{.ValorM2Construcao}}</div>
-														<div class="col-sm-4"><strong>Pavimentos:</strong> {{.QuantidadePavimentos}}</div>
+                            <div class="col-sm-4"><strong>Pavimentos:</strong> {{.QuantidadePavimentos}}</div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">{{.TipoUsoImovel}} - {{.TipoPadraoConstrucao}} - {{.TipoTerreno}}</div>
@@ -114,7 +118,7 @@ const tpl = `
                 </div>
             </div>
         </div>
-				{{end}}
+        {{end}}
         {{else}}
         <div class="row noresults header m-t-3">
             <div class="col-sm-offset-3 col-sm-6">
@@ -151,9 +155,13 @@ const tpl = `
     ga('create', 'UA-80338230-1', 'auto');
     ga('send', 'pageview');
 
-		function convertToURL(text) {
-				return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
-		}
+    function convertToURL(text) {
+        var r = text.toLowerCase(),
+        non_asciis = {'a': '[àáâãäå]', 'ae': 'æ', 'c': 'ç', 'e': '[èéêë]', 'i': '[ìíîï]', 'n': 'ñ', 'o': '[òóôõö]', 'oe': 'œ', 'u': '[ùúûűü]', 'y': '[ýÿ]'};
+        for (i in non_asciis) { r = r.replace(new RegExp(non_asciis[i], 'g'), i); }
+        text = r;
+        return text.toLowerCase().replace(/[^\w ]+/g, '').replace(/ +/g, '-');
+    }
 
     $(function() {
         $("#termos").keypress(function(e) {

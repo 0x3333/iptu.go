@@ -4,8 +4,12 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode"
 
 	"bitbucket.org/terciofilho/iptu.go/db"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 // IPTU Representa um Contribuinte de IPTU
@@ -71,6 +75,9 @@ func HandleRequest(termos string) (*[]IPTU, *RequestError) {
 			Message: "Os Termos devem conter ao menos 3 caracteres cada.",
 		}
 	}
+	// Remove os acentos
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	termos, _, _ = transform.String(t, termos)
 
 	// Remove os .-/ que estão entre números
 	termos = regex1.ReplaceAllString(termos, "$1$2")
