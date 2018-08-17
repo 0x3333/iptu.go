@@ -21,3 +21,4 @@ O repositório inclui uma versão da base de dados de 2016(3 de Junho de 2016), 
 
 ***Nota 2:*** Este projeto foi criado em 2016, logo, deve estar desatualizado
 
+***Nota 3:*** A base de dados 2016 está utilizando [git lfs](https://git-lfs.github.com/)
