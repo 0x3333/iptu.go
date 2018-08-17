@@ -3,11 +3,11 @@ package main
 import (
 	"flag"
 
-	"bitbucket.org/terciofilho/iptu.go/db"
-	"bitbucket.org/terciofilho/iptu.go/importer"
-	"bitbucket.org/terciofilho/iptu.go/log"
-	"bitbucket.org/terciofilho/iptu.go/server"
-	"bitbucket.org/terciofilho/iptu.go/sitemap"
+	"github.com/0x3333/iptu.go/db"
+	"github.com/0x3333/iptu.go/importer"
+	"github.com/0x3333/iptu.go/log"
+	"github.com/0x3333/iptu.go/server"
+	"github.com/0x3333/iptu.go/sitemap"
 )
 
 func main() {

@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"bitbucket.org/terciofilho/iptu.go/db"
-	"bitbucket.org/terciofilho/iptu.go/log"
+	"github.com/0x3333/iptu.go/db"
+	"github.com/0x3333/iptu.go/log"
 )
 
 // RunImport IPTU data

@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"bitbucket.org/terciofilho/iptu.go/api"
-	"bitbucket.org/terciofilho/iptu.go/log"
-	"bitbucket.org/terciofilho/iptu.go/render"
+	"github.com/0x3333/iptu.go/api"
+	"github.com/0x3333/iptu.go/log"
+	"github.com/0x3333/iptu.go/render"
 	"github.com/ajays20078/go-http-logger"
 )
 

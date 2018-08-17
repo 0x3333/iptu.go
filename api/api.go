@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode"
 
-	"bitbucket.org/terciofilho/iptu.go/db"
+	"github.com/0x3333/iptu.go/db"
 	"golang.org/x/text/runes"
 	"golang.org/x/text/transform"
 	"golang.org/x/text/unicode/norm"

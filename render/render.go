@@ -4,8 +4,8 @@ import (
 	"html/template"
 	"io"
 
-	"bitbucket.org/terciofilho/iptu.go/api"
-	"bitbucket.org/terciofilho/iptu.go/log"
+	"github.com/0x3333/iptu.go/api"
+	"github.com/0x3333/iptu.go/log"
 )
 
 const tpl = `

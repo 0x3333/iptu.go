@@ -5,7 +5,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Just to initialize MySQL Driver
 
-	"bitbucket.org/terciofilho/iptu.go/log"
+	"github.com/0x3333/iptu.go/log"
 )
 
 var (
