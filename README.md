@@ -1,4 +1,4 @@
-# Sistema de Consulta de Contribuintes do IPTU São Paulo / SP
+# Sistema de Consulta de Contribuintes do IPTU São Paulo
 
 Este projeto foi criado como a intenção de criar um portal de transparência, exibindo os dados de todos os contribuintes do IPTU da Cidade de São Paulo, como é sabido, muitos utilizam imóveis para lavagem de dinheiro em nossa cidade.
 
@@ -15,7 +15,9 @@ Este projeto foi criado em 2016, porém foi retirado do ar por conta da mobiliza
 
 ## Dados de 2016
 
-O repositório inclui uma versão da base de dados de 2016(3 de Junho de 2016), IPTU-2016-06-03.csv, o sistema foi desenvolvido para este formato do arquivo, para utilizar as versões atuais do arquivo, talvez seja necessário modificar o sistema.
+O repositório inclui uma versão da base de dados de 2016(3 de Junho de 2016), `IPTU-2016-06-03.csv`, o sistema foi desenvolvido para este formato do arquivo, para utilizar as versões atuais do arquivo, talvez seja necessário modificar o sistema.
 
 ***Nota:*** Este foi meu primeiro projeto em Go, utilizei Go pois era uma forma de aprender a linguagem de forma prática.
+
 ***Nota 2:*** Este projeto foi criado em 2016, logo, deve estar desatualizado
+
